@@ -1,0 +1,45 @@
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class VRAutoSimple : MonoBehaviour
+{
+    public GameObject bulletPrefab;
+    public Transform barrelExit;
+    public float bulletSpeed = 40f;
+    public float fireRate = 0.2f;
+
+    private XRGrabInteractable grabInteractable;
+    private float nextTimeToFire = 0f;
+
+    private void Awake()
+    {
+        grabInteractable = GetComponent<XRGrabInteractable>();
+    }
+
+    private void Update()
+    {
+        // 1. Check if the player is currently holding the gun
+        if (grabInteractable.isSelected)
+        {
+            // 2. Check if enough time has passed to shoot again
+            if (Time.time >= nextTimeToFire)
+            {
+                nextTimeToFire = Time.time + fireRate;
+                Shoot();
+            }
+        }
+    }
+
+    private void Shoot()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, barrelExit.position, barrelExit.rotation);
+        
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = barrelExit.forward * bulletSpeed;
+        }
+
+        Destroy(bullet, 5f);
+    }
+}
