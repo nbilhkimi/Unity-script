@@ -1,0 +1,51 @@
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class VRSimplePistol : MonoBehaviour
+{
+    [Header("Pistol Settings")]
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform barrelExit;
+    [SerializeField] private float bulletSpeed = 40f;
+
+    private XRGrabInteractable grabInteractable;
+
+    private void Awake()
+    {
+        // Automatically get the Grab Interactable component on this object
+        grabInteractable = GetComponent<XRGrabInteractable>();
+    }
+
+    private void OnEnable()
+    {
+        // Subscribe to the trigger pull event (Activated)
+        grabInteractable.activated.AddListener(OnTriggerPulled);
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe to avoid memory leaks
+        grabInteractable.activated.RemoveListener(OnTriggerPulled);
+    }
+
+    private void OnTriggerPulled(ActivateEventArgs args)
+    {
+        Shoot();
+    }
+
+    private void Shoot()
+    {
+        // 1. Spawn the bullet at the barrel exit point
+        GameObject spawnedBullet = Instantiate(bulletPrefab, barrelExit.position, barrelExit.rotation);
+
+        // 2. Give the bullet forward momentum if it has a Rigidbody
+        Rigidbody rb = spawnedBullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = barrelExit.forward * bulletSpeed;
+        }
+
+        // 3. Optional: Auto-destroy bullet after 5 seconds to keep your scene clean
+        Destroy(spawnedBullet, 5f);
+    }
+}
