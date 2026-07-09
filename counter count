@@ -1,0 +1,35 @@
+using UnityEngine;
+using UnityEngine.Events;
+
+public class ClickCounter : MonoBehaviour
+{
+    
+    public int targetCount = 5; // The assigned number to reach
+    
+     
+    public UnityEvent onTargetReached; // The event that occurs
+
+    private int currentCount = 0;
+
+    // Call this method whenever the button is clicked
+    public void IncrementCount()
+    {
+        currentCount++;
+        
+
+        // Check if we hit the target
+        if (currentCount >= targetCount)
+        {
+            TriggerEvent();
+        }
+    }
+
+    private void TriggerEvent()
+    {
+        
+        onTargetReached?.Invoke(); // Fires the event safely
+        
+        // Optional: Reset counter if you want it to repeat
+        // currentCount = 0; 
+    }
+}
